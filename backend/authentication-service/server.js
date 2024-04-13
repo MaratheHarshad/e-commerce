@@ -35,5 +35,6 @@ app.get("/", (req, res) => {
 
 // app started on listening on this port
 app.listen(process.env.PORT, () => {
+  console.log(`user ${process.env.USER}`);
   console.log(`server started on http://localhost:${process.env.PORT}`);
 });
