@@ -1,5 +1,6 @@
 package com.bookcharm.app.utils;
 
+import com.bookcharm.app.exception.ProductNotFoundException;
 import com.bookcharm.app.model.Product;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,21 +57,36 @@ public class FileUtils {
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Error while retrieving product image");
             // if no image present
             return null;
-        }
+        } 
+
     }
 
     // this function converts the product images stored in folders into the Base64 format for retrieval
 
     public static List<Product> buildProductImages(List<Product> products){
-        for(Product p : products){
-            if(p.getProductImage() != null){
-                String encodedString = Base64.getEncoder().encodeToString(FileUtils.retrieveImage("products", p.getProductImage()));
 
-                p.setProductImage(encodedString);
+        for(Product p : products){
+
+            System.out.println(p);
+           
+            try {
+                if(p.getProductImage() != null){
+                    String encodedString = Base64.getEncoder().encodeToString(FileUtils.retrieveImage("products", p.getProductImage()));
+                    p.setProductImage(encodedString);
+            }    
+            }     
+            catch (Exception e) {
+                 e.printStackTrace();
+                 System.out.println("error while creating string of image, image may not be exist or bytes return of image may be null");
             }
+        
+            
         }
+
+        
         return products;
     }
 

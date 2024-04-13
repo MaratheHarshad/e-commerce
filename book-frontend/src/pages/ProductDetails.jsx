@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 const ProductDetails = ({ product, addToCart }) => {
   const navigate = useNavigate();
 
-  const user = useSelector((u) => u.user.user);
+  const user = useSelector((u) => u.user);
 
   const handleAddToCart = (productId, quantity) => {
     alert(productId, quantity);
