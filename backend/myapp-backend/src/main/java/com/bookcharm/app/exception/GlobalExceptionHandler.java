@@ -30,4 +30,20 @@ public class GlobalExceptionHandler {
         ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
     }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> handleInvalidEmailException(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Invalid email id");
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<String> handleEmailAlreadyExistsException(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+
 }

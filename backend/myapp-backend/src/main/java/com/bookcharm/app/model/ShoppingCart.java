@@ -27,17 +27,20 @@ public class ShoppingCart {
     @JsonIgnore
     private User user;
 
+    // Other shopping cart attributes and methods
+
+    // Getters and setters
+    
     @OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<ShoppingCartProduct> cartProducts = new HashSet<>();
 
-    // Other shopping cart attributes and methods
-
-    // Getters and setters
+   
 
     public Set<ShoppingCartProduct> getCartProducts(){
         return cartProducts;
     }
+    
     // constructors
 
     // methods

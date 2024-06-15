@@ -1,34 +1,32 @@
 import axios from "axios";
 import { BASE_API_URL } from "../common/constant";
 
-const API_URL = BASE_API_URL + "/api/book";
+const API_URL = BASE_API_URL + "/products";
 
 class BookService {
   saveBook(book) {
     return axios.post(API_URL + "/", book);
   }
   getAllBook() {
-    return [
-      { image: "rushi", id: 2, title: "RushiT" },
-      { image: "rushi", id: 2, title: "RushiT" },
-    ];
-    //return axios.get(API_URL + "/");
+    return axios.get(API_URL);
   }
 
-  getBookById(id) {
-    return {
-      id: 1,
-      bookName: "bookName",
-      description: "description",
-      author: "author",
-      categorysId: "categorysId",
-      isbnNo: "isbnNo",
-      language: "language",
-      price: 50,
-      img: "img",
-      category: "category",
-    };
-    //return axios.get(API_URL + "/" + id);
+  getBookById(productId) {
+    // return {
+    //   id: 1,
+    //   productName: "bookName",
+    //   productDescription: "description",
+    //   author: "author",
+    //   // categorysId: "categorysId",
+    //   isbn: "isbnNo",
+    //   // language: "language",
+    //   productPrice: 200,
+    //   productImage: null,
+    //   category: {
+    //     type: "BOOK",
+    //   },
+    // };
+    return axios.get(`${API_URL}/${productId}`);
   }
 
   updateBook(book) {

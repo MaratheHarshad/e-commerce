@@ -6,6 +6,8 @@ const validateToken = async (req) => {
 
   const jwtToken = req.header("Authorization");
 
+  console.log(jwtToken);
+
   if (!jwtToken) {
     return {
       success: false,
@@ -33,7 +35,5 @@ const validateToken = async (req) => {
     };
   }
 };
-
-
 
 module.exports = { validateToken };

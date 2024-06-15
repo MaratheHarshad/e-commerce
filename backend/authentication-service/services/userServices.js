@@ -18,6 +18,7 @@ async function createUser(req) {
     req.body;
 
   console.log(email, passWord);
+
   // validate email
   const emailValidationResult = await validateEmail(email);
   console.log(emailValidationResult);
@@ -29,6 +30,7 @@ async function createUser(req) {
       message: "Invalid email address",
     };
   }
+
   // validate mobileNumber if exists
 
   // validate address if exists
@@ -39,20 +41,6 @@ async function createUser(req) {
   if (profileUrl === undefined) {
     profileUrl = null;
   }
-
-  // firstName = await capitalize(firstName);
-  // lastName = await capitalize(lastName);
-
-  // try {
-  //   // verify whether user already exists or not
-  //   const existingUser = await User.findOne({ where: { email: email } });
-
-  //   if (existingUser) {
-  //     return {
-  //       success: false,
-  //       message: "User with this email already exists",
-  //     };
-  //   }
 
   // instead of storing the plain text password in database
   // encrypt a password using a hashing function and stored

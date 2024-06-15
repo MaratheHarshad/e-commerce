@@ -179,20 +179,5 @@ public class Product {
 		return Objects.hash(productId);
 	}
 
-	@Override
-    public String toString() {
-        return "Product{" +
-                "productId=" + productId +
-                ", productName='" + productName + '\'' +
-                ", productPrice=" + productPrice +
-                ", productDescription='" + productDescription + '\'' +
-                ", productImage='" + productImage + '\'' +
-                ", stock=" + stock +
-                ", category=" + category +
-                ", seller=" + seller +
-                ", viewCount=" + viewCount +
-                ", author='" + author + '\'' +
-                ", isbn='" + isbn + '\'' +
-                '}';
-    }
+	
 }

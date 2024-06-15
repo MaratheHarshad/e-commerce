@@ -12,7 +12,7 @@ public interface SellerService {
     Seller getSellerById(Long sellerId);
     Seller createSeller(SellerRegistrationDto sellerRegistrationDto);
     Seller verifySeller(Long sellerId, String adminJwtToken);
-    boolean deleteSeller(Long sellerId);
+    boolean deleteSeller(Long sellerId, String adminJwtToken);
     SellerResponse loginSeller(SellerLoginDto sellerLoginDto);
     // Other SellerService methods
 	List<Seller> getAllUnVerifiedSellers(String jwtToken);

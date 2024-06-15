@@ -1,17 +1,22 @@
 package com.bookcharm.app.service;
 
-import com.bookcharm.app.model.Address;
-import com.bookcharm.app.repository.AddressRepository;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.bookcharm.app.exception.UnauthorizedAccessException;
+import com.bookcharm.app.model.Address;
+import com.bookcharm.app.repository.AddressRepository;
+import com.bookcharm.app.utils.JwtUtil;
 
 @Service
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public Address getAddressById(Long addressId) {
@@ -51,6 +56,21 @@ public class AddressServiceImpl implements AddressService {
         }
         return false;
     }
+
+	@Override
+	public Optional<Address> getAddressOfUser(String authorization) {
+		// TODO Auto-generated method stub
+		
+		Optional<Long> userId = jwtUtil.verifyUser(authorization);
+		
+		if(userId.isPresent()) {
+			//userId and addressId will be same due to oneToone Relationship
+			Optional<Address> address = addressRepository.findAddressByAddressId(userId.get());
+			return address;
+		}else {
+			throw new UnauthorizedAccessException("User Not Found");
+		}
+	}
 
     // Add other AddressService methods if needed
 }

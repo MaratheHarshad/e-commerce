@@ -1,8 +1,13 @@
 package com.bookcharm.app.controller;
 
+import com.bookcharm.app.exception.AuthenticationFailedException;
 import com.bookcharm.app.model.Address;
 import com.bookcharm.app.service.AddressService;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,15 +18,7 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    @GetMapping("/{addressId}")
-    public ResponseEntity<Address> getAddressById(@PathVariable Long addressId) {
-        Address address = addressService.getAddressById(addressId);
-        if (address != null) {
-            return ResponseEntity.ok(address);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    
 
     @PostMapping
     public ResponseEntity<Address> createAddress(@RequestBody Address address) {
@@ -30,26 +27,27 @@ public class AddressController {
         return ResponseEntity.ok(createdAddress);
     }
 
-    @PutMapping("/{addressId}")
-    public ResponseEntity<Address> updateAddress(@PathVariable Long addressId, @RequestBody Address address) {
+    @PutMapping
+    public ResponseEntity<Address> updateAddress(@RequestHeader String Authorization, @RequestBody Address address) {
         // Add logic for updating an existing address
-        Address updatedAddress = addressService.updateAddress(addressId, address);
-        if (updatedAddress != null) {
-            return ResponseEntity.ok(updatedAddress);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+       return null;
+        
     }
 
-    @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId) {
-        // Add logic for deleting an address
-        boolean deleted = addressService.deleteAddress(addressId);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+   
+@GetMapping
+    
+    public ResponseEntity<?> getUserAdderss(@RequestHeader String Authorization){
+    	
+    	
+    	try {
+    		Optional<Address> address = addressService.getAddressOfUser(Authorization);
+    		return new ResponseEntity<Optional<Address>>(address,HttpStatus.OK);
+    	}catch(AuthenticationFailedException ex){
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
+    		
+    	}
+    	
     }
 
     // Other AddressController methods

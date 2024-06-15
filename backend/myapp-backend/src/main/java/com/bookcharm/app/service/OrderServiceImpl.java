@@ -1,24 +1,19 @@
 package com.bookcharm.app.service;
 
-import com.bookcharm.app.model.Order;
-import com.bookcharm.app.repository.OrderRepository;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.bookcharm.app.model.Order;
+import com.bookcharm.app.repository.OrderRepository;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-	
-	
-	
 
     @Autowired
     private OrderRepository orderRepository;
-    
-    
-    @Override
+
     public Order getOrderById(Long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         return optionalOrder.orElse(null);
@@ -27,6 +22,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(Order order) {
         // Add logic for order creation, validation, etc.
+
+        // user identification
+        // inventory checking using productId under order.product
+        // if all is ok
+        // 
+
+        // Ensure totalAmount is at least 1.00 INR
+        if (order.getTotalAmount() < 1.00) {
+            // Set a minimum amount, you can customize this value as needed
+            order.setTotalAmount(1.00);
+        }
+
         return orderRepository.save(order);
     }
 

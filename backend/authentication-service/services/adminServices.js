@@ -26,9 +26,6 @@ async function login(req) {
   }
 }
 
-
-async function validateToken(req) {
-  
-}
+async function validateToken(req) {}
 
 module.exports = { login };

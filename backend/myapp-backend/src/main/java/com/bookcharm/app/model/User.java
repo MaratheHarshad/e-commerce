@@ -33,10 +33,16 @@ public class User {
     @Column(name = "profileUrl")
     private String profileUrl;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private ShoppingCart shoppingCart;
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
     private Set<Order> orders;
+    
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval=true)
+    private Address address;
 
 
     // Constructors

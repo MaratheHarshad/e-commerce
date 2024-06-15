@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     sellerService
       .verifySeller(sellerId)
       .then((data) => {
-        notify(`seller with ${sellerId} removed successfully`);
+        notify(`seller with id ${sellerId} verified successfully`);
         // update the unverified sellers list
         const updatedSellers = unverifiedSellers.filter(
           (unverifiedSeller) => unverifiedSeller.sellerID !== sellerId
@@ -47,24 +47,35 @@ const AdminDashboard = () => {
         setUnverifiedSellers(updatedSellers);
       })
       .catch((error) => {
-        notifyError("error while removing seller");
+        notifyError("error while verifying seller");
       });
   };
 
   const onReject = (sellerId) => {
     // Remove the seller with the given id from the list
-    const updatedSellers = unverifiedSellers
-      .map((seller) => {
-        if (seller.id === sellerId) {
-          const updatedSeller = { ...seller, status: "rejected" };
-          sellerService.updateSeller(updatedSeller); // Update seller status
-          return null; // Returning null to remove the seller from the list
-        }
-        return seller;
-      })
-      .filter(Boolean); // Filter out null values
 
-    setUnverifiedSellers(updatedSellers);
+    let flag = window.confirm(
+      "Are sure you want to reject seller with id " + sellerId
+    );
+
+    if (flag) {
+      sellerService
+        .removeSeller(sellerId)
+        .then((data) => {
+          notify(`seller with id${sellerId} removed successfully`);
+          // update the unverified sellers list
+          const updatedSellers = unverifiedSellers.filter(
+            (unverifiedSeller) => unverifiedSeller.sellerID !== sellerId
+          );
+
+          console.log(updatedSellers);
+          // set updatedSellers as new state
+          setUnverifiedSellers(updatedSellers);
+        })
+        .catch((error) => {
+          notifyError("error while removing seller");
+        });
+    }
   };
 
   // toast buttons

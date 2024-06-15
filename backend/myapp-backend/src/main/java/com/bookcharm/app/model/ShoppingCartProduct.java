@@ -3,6 +3,9 @@ package com.bookcharm.app.model;
 import lombok.*;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 @Entity
@@ -17,14 +20,15 @@ public class ShoppingCartProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shoppingCartId")
-    @ToString.Exclude
+//    @ToString.Exclude
     private ShoppingCart shoppingCart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "productId")
-    @ToString.Exclude
+//    @ToString.Exclude
     private Product product;
 
     private int quantity;

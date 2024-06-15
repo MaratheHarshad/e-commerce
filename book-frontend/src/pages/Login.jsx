@@ -29,7 +29,10 @@ const Login = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const loginUser = useSelector((u) => u.user);
+  const loginSeller = useSelector((state) => state.seller);
+  const loginAdmin = useSelector((state) => state.admin);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,7 +46,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (loginUser?.id) {
+    if (loginUser || loginAdmin || loginSeller) {
       navigate("/");
     }
   }, []);
@@ -56,7 +59,9 @@ const Login = () => {
       .login(login)
       .then((res) => {
         // save jwt token in local storage
-        console.log(res);
+        console.log(res.data);
+        console.log(res.data.token);
+
         localStorage.setItem("token", res.data.token);
 
         dispatch(setCurrentUser({ user: res.data.user }));
@@ -66,8 +71,8 @@ const Login = () => {
         navigate("/");
       })
       .catch((error) => {
-        setMessage("invalid email and password");
         console.log(error);
+        setMessage("invalid email or password");
         setShowSpinner(false);
       });
   };

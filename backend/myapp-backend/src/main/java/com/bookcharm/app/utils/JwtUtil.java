@@ -38,6 +38,7 @@ public class JwtUtil {
 	public Optional<Long> verifyUser(String jwt) {
 
 		try{
+			
 			Long userID = getAuthenticationServiceWebClient().post().uri("/user/validate-token").header(HttpHeaders.AUTHORIZATION, jwt).retrieve().onStatus(HttpStatus::is4xxClientError, clientResponse -> handleClientError(clientResponse)).bodyToMono(UserValidationResponseDto.class).map((UserValidationResponseDto::getUserId)).block();
 			return Optional.of(userID);
 		}catch(Exception e){
@@ -53,11 +54,13 @@ public class JwtUtil {
 //		SellerValidationDto sellerValidationDto = new SellerValidationDto();
 //		sellerValidationDto.setToken(jwt);
 
+		System.out.println("from verify seller" + jwt);
 		try{
 			Long sellerId = getAuthenticationServiceWebClient().post().uri("/seller/validate-token").header(HttpHeaders.AUTHORIZATION, jwt).retrieve().onStatus(HttpStatus::is4xxClientError, clientResponse -> handleClientError(clientResponse)).bodyToMono(SellerValidationResponseDto.class).map((SellerValidationResponseDto::getSellerId)).block();
 			return Optional.of(sellerId);
 		}catch(Exception e){
 			System.out.println(e.getMessage());
+//			throw e;
 		}
 
 		// if no sellerId found

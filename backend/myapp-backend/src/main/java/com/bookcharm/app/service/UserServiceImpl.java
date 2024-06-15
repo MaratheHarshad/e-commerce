@@ -2,9 +2,13 @@ package com.bookcharm.app.service;
 
 import com.bookcharm.app.dto.*;
 import com.bookcharm.app.exception.*;
+import com.bookcharm.app.model.Address;
+import com.bookcharm.app.model.Order;
 import com.bookcharm.app.model.ShoppingCart;
 import com.bookcharm.app.model.User;
 import com.bookcharm.app.repository.UserRepository;
+import com.bookcharm.app.utils.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,7 +19,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -23,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private WebClient.Builder builder;
 
@@ -95,6 +105,15 @@ public class UserServiceImpl implements UserService {
             // persist the user in db
             newUser = userRepository.save(newUser);
 
+
+            // login the current user using newUser id generated with and return token
+            LoginValidationDto loginValidationDto = new LoginValidationDto();
+            loginValidationDto.setUserId(newUser.getUserId());
+            loginValidationDto.setUserPassword(newUser.getPassWord());
+            loginValidationDto.setValidationPassword(userRegistrationDto.getPassWord());
+
+            String jwtToken = authenticationServiceWebClient.post().uri("/user/login").body(BodyInserters.fromValue(loginValidationDto)).retrieve().onStatus(HttpStatus::is4xxClientError,clientResponse ->  handleClientError(clientResponse)).bodyToMono(LoginResponse.class).map(LoginResponse::getToken).block();
+
             // send email to user
 
             // .subscribe() allows us to send non-blocking request to the another server
@@ -105,7 +124,7 @@ public class UserServiceImpl implements UserService {
             }
 
 
-            return new RegistrationResponse(newUser, registrationApiResponse.getToken());
+            return new RegistrationResponse(newUser, jwtToken);
 
         }
 
@@ -169,6 +188,7 @@ public class UserServiceImpl implements UserService {
         }
         return false; // User with the given ID does not exist
     }
+
 //    @Override
 //    public void addToCart(Long userId, Long productId, Integer quantity) {
 //        User user = userRepository.findById(userId).orElse(null);
@@ -224,6 +244,30 @@ public class UserServiceImpl implements UserService {
 //            userRepository.save(user);
 //        }
 //    }
+    
+   
+    @Override
+	public Set<Order> getAllOrdersOfUsers(String authorization) {
+		
+    	Optional<Long> userId = jwtUtil.verifyUser(authorization);
+    	if(userId.isPresent()) {
+    		Optional<User> user = userRepository.findById(userId.get());
+    		if(user.isPresent()) {
+    			Set<Order> orders = user.get().getOrders();
+    			return orders;
+    		}else {
+    			throw new UserNotFoundException("USER NOT FOUND");
+    		}
+    	}else {
+    		throw new UnauthorizedAccessException("UNAUTHORIZE");
+    	}
+		
+	}
+    	
+    	
+    	
+    	
+    
 
     // handle client error if, token is invalid throw UnauthorizedAccessException or throw ClientErrorException
     private Mono<? extends Throwable> handleClientError(ClientResponse clientResponse) {
@@ -233,7 +277,13 @@ public class UserServiceImpl implements UserService {
             return Mono.error(new AuthenticationFailedException("password not match"));
         }
 
+        if(clientResponse.statusCode().equals(HttpStatus.CONFLICT)){
+            return Mono.error(new InvalidEmailException("Invalid email provided"));
+        }
+
         return Mono.error(new ClientErrorException("Client Error: " + clientResponse.statusCode()));
 
     }
+
+	
 }

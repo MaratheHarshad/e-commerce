@@ -30,7 +30,7 @@ class userService {
   // send request to update the user
   update(user, formData) {
     return axios.put(
-      API_URL + "/put",
+      API_URL,
       {
         user: user,
         formData: formData,
@@ -43,6 +43,9 @@ class userService {
       }
     );
   }
+
+
+  
 }
 
 export default new userService();

@@ -41,30 +41,36 @@ const SellerRegister = () => {
       initialValues: initialValues,
 
       onSubmit: (values, action) => {
-        setShowSpinner(true);
-        sellerService
-          .register(values)
-          .then((res) => {
-            const navigateToHomePageTimeout = setTimeout(() => {
-              // after successfully login register navigate to the home page of seller
-              navigate("/");
-            }, 5000);
+        if (values.passWord !== values.confirmPassWord) {
+          alert("password and confirm password should be same");
+        } else {
+          setShowSpinner(true);
+          sellerService
+            .register(values)
+            .then((res) => {
+              const navigateToHomePageTimeout = setTimeout(() => {
+                // after successfully login register navigate to the home page of seller
+                navigate("/");
+              }, 5000);
 
-            notify(res);
-            notify("Your request is under processing, we notify you on email");
-            setShowSpinner(false);
-          })
-          .catch((error) => {
-            console.log(error);
+              notify(res);
+              notify(
+                "Your request is under processing, we notify you on email"
+              );
+              setShowSpinner(false);
+            })
+            .catch((error) => {
+              console.log(error);
 
-            // if (error.response?.status === 409) {
-            // notifyError(error.response.data);
-            // }
+              // if (error.response?.status === 409) {
+              // notifyError(error.response.data);
+              // }
 
-            // global error notifier
-            notifyError(error.response.data);
-            setShowSpinner(false);
-          });
+              // global error notifier
+              notifyError(error.response.data);
+              setShowSpinner(false);
+            });
+        }
       },
     });
 
@@ -199,7 +205,7 @@ const SellerRegister = () => {
                   <div className="col">
                     <label>Password</label>
                     <input
-                      type="text"
+                      type="password"
                       name="passWord"
                       id="psw"
                       className="form-control form-control-sm"
@@ -214,7 +220,7 @@ const SellerRegister = () => {
                   <div className="col">
                     <label>Confirm Password</label>
                     <input
-                      type="text"
+                      type="password"
                       name="confirmPassWord"
                       className="form-control form-control-sm"
                       value={values.confirmPassWord}

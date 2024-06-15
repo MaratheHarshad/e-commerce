@@ -8,20 +8,17 @@ const Orders = () => {
   const [orderList, setOrderList] = useState([]);
 
   useEffect(() => {
-    //uncomment the code when actual backend api is called 
-    {/*
-     orderService
-       .getOrderByUser()
-       .then((res) => {
-        setOrderList(res.data);
-       })
-      .catch((error) => {
-         console.log(error);
-     });
+    
 
-    */}
+    orderService.getAllOrdersByUser().then(res=>{
 
-    setOrderList(orderService.getOrderByUser());
+      console.log("This is Order List "+ res.data);
+      setOrderList(res.data);
+    }).catch(error=>{
+      console.log(error);
+    });
+
+    
   }, []);
 
   return (

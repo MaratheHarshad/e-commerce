@@ -7,7 +7,7 @@ export const setCurrentAdmin = (admin) => {
   };
 };
 
-export const clearCurrentSeller = () => {
+export const clearCurrentAdmin = () => {
   return {
     type: CLEAR_CURRENT_ADMIN,
   };

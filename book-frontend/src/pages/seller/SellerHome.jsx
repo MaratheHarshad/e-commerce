@@ -3,7 +3,35 @@ import Book from "../../model/Book";
 import sellerService from "../../service/seller.service";
 //import Book from './Book'; // Assuming you have a Book component
 
+import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
+
+import { toast, ToastContainer } from "react-toastify";
+
+import { RotatingLines } from "react-loader-spinner";
+
+import genericbook from "../../generic-book.jpg";
+
 const SellerHome = () => {
+  const productValues = {
+    productName: "",
+    productDescription: "",
+    stock: "",
+    author: "",
+    productPrice: "",
+    isbn: "",
+    category: "",
+  };
+
+  //  productName: "",
+  //   productDescription: "",
+  //   stock: "",
+  //   author: "",
+  //   productPrice: "",
+  //   productImage: "",
+  //   isbn: "",
+  //   category: "BOOK",
+
   //storing the list of all books of seller
   const [books, setBooks] = useState([]);
   //for storing new new book that seller will add
@@ -11,31 +39,43 @@ const SellerHome = () => {
     new Book("", "", "", "", "", "", "", "", "", "", "")
   );
 
+  const [productImage, setProductImage] = useState(null);
+
+  const navigate = useNavigate();
+
+  // state for spinner button
+
+  const [showSpinner, setShowSpinner] = useState(false);
+
   const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
-    setBooks(sellerService.getAllBooks());
+    sellerService
+      .getAllBooks()
+      .then((res) => {
+        console.log(res.data);
+
+        // const products = res.data.map((product) => {
+        //   product.productImage = `data:image/jpeg;base64,${product.productImage}`;
+        // });
+
+        setBooks(res.data);
+      })
+      .then((err) => {
+        console.log(err);
+      });
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewBook({ ...newBook, [name]: value });
-  };
-
-  // function that will add new book
-  const handleAddBook = () => {
-    console.log(newBook);
-    sellerService.addBook(newBook);
-    setNewBook(new Book("", "", "", "", "", "", "", "", "", "", ""));
-    setShowAddForm(false);
-  };
 
   const handleQuantityChange = (id, newQuantity) => {
     setBooks(
       books.map((book) =>
-        book.id === id ? { ...book, quantity: newQuantity } : book
+        book.productId === id ? { ...book, quantity: newQuantity } : book
       )
     );
+  };
+
+  const handleImageChange = (event) => {
+    setProductImage(event.target.files[0]);
   };
 
   const handleDeleteBook = (id) => {
@@ -43,8 +83,76 @@ const SellerHome = () => {
     sellerService.deleteBook(id);
   };
 
+  const { values, errors, handleChange, handleSubmit, handleBlur, touched } =
+    useFormik({
+      initialValues: productValues,
+
+      onSubmit: (values, action) => {
+        setShowSpinner(true);
+
+        const formData = new FormData();
+
+        // append all the new book data in formData
+        // for (let key in values) {
+        //   formData.append(key, values[key]);
+        // }
+
+        formData.append("productName", values.productName);
+        formData.append("productDescription", values.productDescription);
+        formData.append("stock", values.stock);
+        formData.append("author", values.author);
+        formData.append("productPrice", values.productPrice);
+        formData.append("isbn", values.isbn);
+        formData.append("category", values.category);
+
+        // append the productImage in formData to send it to the server
+        formData.append("productImage", productImage);
+
+        sellerService
+          .addProduct(formData)
+          .then((res) => {
+            notify(res);
+            notify("product added");
+
+            setShowAddForm(true);
+          })
+          .catch((error) => {
+            console.log(error);
+
+            notifyError(error.response.data);
+          });
+
+        setShowSpinner(false);
+      },
+    });
+
+  // toast buttons
+  const notifyError = (msg) => {
+    toast.error(msg, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const notify = (msg) => {
+    toast.success(msg, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
   return (
-    <div className="container-fluid p-5">
+    <div className="mb-5 container-fluid p-5">
       <div className="row">
         <div className="col-md-8">
           <table className="table">
@@ -55,14 +163,15 @@ const SellerHome = () => {
                 <th scope="col">Price</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Action</th>
+                <th scope="col">Image</th>
               </tr>
             </thead>
             <tbody className="text-center">
               {books.map((book) => (
                 <tr key={book.id}>
-                  <td>{book.title}</td>
+                  <td>{book.productName}</td>
                   <td>{book.author}</td>
-                  <td>{book.price}</td>
+                  <td>{book.productPrice}</td>
                   <td>
                     <button
                       className="btn btn-sm btn-dark me-1"
@@ -90,10 +199,21 @@ const SellerHome = () => {
                       Delete
                     </button>
                   </td>
+                  <td>
+                    <img
+                      src={
+                        book.productImage
+                          ? `data:image/jpeg;base64,${book.productImage}`
+                          : genericbook
+                      }
+                      height="100px"
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
           <button
             className="btn btn-primary"
             onClick={() => setShowAddForm(true)}
@@ -108,9 +228,9 @@ const SellerHome = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="title"
-                  value={newBook.title}
-                  onChange={handleInputChange}
+                  name="productName"
+                  value={values.productName}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -120,8 +240,8 @@ const SellerHome = () => {
                   type="text"
                   className="form-control"
                   name="author"
-                  value={newBook.author}
-                  onChange={handleInputChange}
+                  value={values.author}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -130,9 +250,9 @@ const SellerHome = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="price"
-                  value={newBook.price}
-                  onChange={handleInputChange}
+                  name="productPrice"
+                  value={values.productPrice}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -141,19 +261,68 @@ const SellerHome = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="quantity"
-                  value={newBook.quantity}
-                  onChange={handleInputChange}
+                  name="stock"
+                  value={values.stock}
+                  onChange={handleChange}
                   required
                 />
               </div>
-              <button className="btn btn-success" onClick={handleAddBook}>
-                Add Book
-              </button>
+              <div className="mb-3">
+                <label>Add Description:</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="productDescription"
+                  value={values.productDescription}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label>isbn No:</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="isbn"
+                  value={values.isbn}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label>Upload Image:</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  name="productImage"
+                  onChange={handleImageChange}
+                  required
+                />
+              </div>
+
+              {showSpinner ? (
+                <RotatingLines />
+              ) : (
+                <button className="btn btn-success" onClick={handleSubmit}>
+                  Add Book
+                </button>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

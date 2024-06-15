@@ -8,6 +8,7 @@ const { validateEmail } = require("./mailServices");
 const register = async (req) => {
   try {
     // access the seller registration data
+    
     let { firstName, lastName, panNumber, mobileNumber, email, passWord } =
       req.body;
 
@@ -19,8 +20,8 @@ const register = async (req) => {
 
     // validate email
 
-    /*
     const emailValidationResult = await validateEmail(email);
+    
     console.log(emailValidationResult);
 
     // if email is not valid, return message as email is not valid
@@ -30,7 +31,6 @@ const register = async (req) => {
         message: "Invalid email address",
       };
     }
-    */
 
     // Hash the password
     const hashedPassword = await hashPassword(passWord);

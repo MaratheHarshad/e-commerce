@@ -20,6 +20,8 @@ const SellerLogin = () => {
   const [message, setMessage] = useState("");
   const [logMessage, setLogMessage] = useState("");
 
+  const loginSeller = useSelector((state) => state.seller);
+
   const [login, userLogin] = useState({
     email: "",
     passWord: "",
@@ -43,9 +45,9 @@ const SellerLogin = () => {
   };
 
   useEffect(() => {
-    // if (loginSeller.seller) {
-    //   navigate("/sellerHome");
-    // }
+    if (loginSeller !== null && loginSeller.seller) {
+      navigate("/sellerHome");
+    }
   }, []);
 
   const loginSubmit = (e) => {

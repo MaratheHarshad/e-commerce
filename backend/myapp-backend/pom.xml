@@ -56,6 +56,11 @@
 			<version>1.18.30</version>
 			<scope>provided</scope>
 		</dependency>
+		 <dependency>
+        <groupId>com.razorpay</groupId>
+        <artifactId>razorpay-java</artifactId>
+        <version>1.4.4</version> <!-- Replace with the latest version available -->
+    </dependency>
 
 
 
@@ -67,8 +72,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
 
 </project>

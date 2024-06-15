@@ -6,47 +6,51 @@ import { BASE_API_URL } from "../../common/constant";
 import { Link, useNavigate } from "react-router-dom";
 import orderService from "../../service/order.service";
 import { useSelector } from "react-redux";
+import userService from "../../service/user.service";
+import addressService from "../../service/address.service";
+
+
 
 const Cart = () => {
-  const [user, setUser] = useState({
-    id: "",
-    name: "",
-    email: "",
-    password: "",
-    mobNo: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-  });
+  const user = useSelector((u) => u.user.user);
 
-  const loginUser = useSelector((u) => u.user);
-
-  user.id = loginUser.id;
-  user.name = loginUser.name;
-  user.email = loginUser.email;
-  user.mobNo = loginUser.mobNo;
-  user.address = loginUser.address;
-  user.city = loginUser.city;
-  user.state = loginUser.state;
-  user.pincode = loginUser.pincode;
-
+  const [address, setAddress] = useState();
   const [cartList, setCartList] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pymtType, setPymtType] = useState("");
   const navigate = useNavigate();
+
   useEffect(() => {
     init();
   }, []);
 
+  useEffect(() => {
+    //code for calcuating totalPrice
+    var calculateTotalPrice = 0;
+
+    cartList.forEach((item) => {
+      console.log(totalPrice);
+      console.log(item.product);
+      console.log(item.product.productPrice);
+      console.log(item.quantity);
+      calculateTotalPrice += item.product.productPrice * item.quantity;
+    });
+    setTotalPrice(calculateTotalPrice);
+    console.log(totalPrice);
+  }, [cartList]);
+
   const init = async () => {
     let cart = await cartService.getCart();
+    console.log(cart);
     setCartList(cart.data);
-    setTotalPrice(cart.data[cart.data.length - 1].totalPrice);
+
+    // let address = await addressService.getAddress();
+    // console.log(address);
+    // setAddress(address);
   };
 
   const plusCart = (id, qu) => {
-    qu = qu + 1;
+    qu += 1;
 
     if (qu > 1) {
       cartService
@@ -64,7 +68,7 @@ const Cart = () => {
     qu = qu - 1;
     if (qu < 1) {
       cartService
-        .deleteCart(id)
+        .deleteCart(id, qu)
         .then((res) => {
           init();
           notify();
@@ -92,17 +96,19 @@ const Cart = () => {
     e.preventDefault();
 
     if (pymtType === "COD") {
-      orderService
-        .createOrder(pymtType)
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      navigate("/orderSucc");
+      // orderService
+      //   .createOrder(pymtType)
+      //   .then((res) => {
+      //     console.log(res.data);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+      // navigate("/orderSuccessful");
+      alert("This service is under maintenance");
     } else {
-      navigate("/cardPayment/" + totalPrice);
+      alert(totalPrice);
+      navigate(`/PaymentForm/${totalPrice}`);
     }
   };
 
@@ -134,33 +140,39 @@ const Cart = () => {
             </thead>
             <tbody className="text-center">
               {cartList.map((item, ind) => (
-                <tr key={item.id}>
+                <tr key={item.productId}>
                   <th scope="row">
                     <img
-                     // src={BASE_API_URL + "/" + item.book.img}
+                      src={item.product.productImage}
                       width="70px"
                       height="70px"
                     />
                   </th>
-                  <td>{item.book.bookName}</td>
-                  <td>{item.book.price}</td>
+                  <td>{item.product.productName}</td>
+                  <td>{item.product.productPrice}</td>
                   <td>{item.quantity}</td>
-                  <td>{item.quantity * item.book.price}</td>
+                  <td>{item.quantity * item.product.productPrice}</td>
                   <td className="text-center">
                     <a
-                      onClick={() => plusCart(item.id, item.quantity)}
+                      onClick={() =>
+                        plusCart(item.product.productId, item.quantity)
+                      }
                       className="text-dark"
                     >
-                      <i class="fa-solid fa-plus">plus</i>
+                      <i class="fa-solid fa-plus"></i>
+                      Plus
                     </a>
                     <button className="btn btn-sm btn-dark ms-2 me-2">
                       {item.quantity}{" "}
                     </button>
                     <a
-                      onClick={() => minusCart(item.id, item.quantity)}
+                      onClick={() =>
+                        minusCart(item.product.productId, item.quantity)
+                      }
                       className="text-dark ms-1"
                     >
-                      <i class="fa-solid fa-minus">minus</i>
+                      <i class="fa-solid fa-minus"></i>
+                      minus
                     </a>
                   </td>
                 </tr>
@@ -179,22 +191,16 @@ const Cart = () => {
           <div className="col-md-12">
             <div className="card paint-card">
               <div className="card-body">
-                <p className="fs-6 text-Secondary text-center">
+                {/* <p className="fs-6 text-Secondary text-center">
                   Delivery Address
+                </p> */}
+                <p>
+                  Name : {user.firstName} {user.lastName}
                 </p>
-
-                <p style={{ color: "black" }}>
-                  {user.name} <br />
-                  {user.address} <br />
-                  {user.city},{user.state},{user.pincode} <br />
-                  Mobile No: {user.mobNo}
-                </p>
-                 <Link
-                  className="fs-5 text-decoration-none"
-                  to="/editProfile"
-                >
+                <p style={{ color: "black" }}>Mobile No: {user.mobileNumber}</p>
+                <Link className="fs-5 text-decoration-none" to="/editProfile">
                   Change Address
-                </Link> 
+                </Link>
               </div>
             </div>
           </div>
@@ -207,8 +213,7 @@ const Cart = () => {
                   Amount: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  <i className="fas fa-rupee-sign"></i> {50 //totalPrice
-                  }
+                  <i className="fas fa-rupee-sign"></i> {totalPrice}
                   <br /> Shipping Charge:&nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;

@@ -1,4 +1,5 @@
 const sellerService = require("../services/sellerServices");
+const { validateToken } = require("../authentication/validateToken");
 
 // function to register the seller
 exports.registerSeller = async (req, res) => {
@@ -10,7 +11,7 @@ exports.registerSeller = async (req, res) => {
         message: result.message,
       });
     } else {
-      return res.status(400).json({ message: result.message });
+      return res.status(409).json({ message: result.message });
     }
   } catch (error) {
     console.log("Error Occured : ", error);

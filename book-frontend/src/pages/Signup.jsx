@@ -22,6 +22,7 @@ const Signup = () => {
     lastName: "",
     email: "",
     passWord: "",
+    confirmPassWord: "",
     mobileNumber: "",
     address: "",
     city: "",
@@ -58,33 +59,37 @@ const Signup = () => {
       onSubmit: (values, action) => {
         console.log(values);
 
-        // show spinner
-        setShowSpinner(true);
+        if (values.passWord !== values.confirmPassWord) {
+          alert("password and confirm password should be same");
+        } else {
+          // show spinner
+          setShowSpinner(true);
 
-        userService
-          .register(values)
-          .then((data) => {
-            const navigateToHomePageTimeout = setTimeout(() => {
-              navigate("/");
-            }, 2000);
+          userService
+            .register(values)
+            .then((data) => {
+              const navigateToHomePageTimeout = setTimeout(() => {
+                navigate("/");
+              }, 2000);
 
-            notify("Register sucessfully");
-            // save jwt token in local storage
-            // set the JWT token for authenticated user
-            localStorage.setItem("token", data.data.token);
+              notify("Register sucessfully");
+              // save jwt token in local storage
+              // set the JWT token for authenticated user
+              localStorage.setItem("token", data.data.token);
 
-            // set the current authenticated user as new registered user using dispatcher of react-redux
-            dispatch(setCurrentUser({ user: data.data.user }));
-            action.resetForm();
-            // clear the time out settled for before navigate to home page
-          })
-          .catch((error) => {
-            console.log(error);
-            if (error.response?.status === 409) {
-              notifyError(error.response.data);
-              setShowSpinner(false);
-            }
-          });
+              // set the current authenticated user as new registered user using dispatcher of react-redux
+              dispatch(setCurrentUser({ user: data.data.user }));
+              action.resetForm();
+              // clear the time out settled for before navigate to home page
+            })
+            .catch((error) => {
+              console.log(error);
+              if (error.response?.status === 409) {
+                notifyError(error.response.data);
+                setShowSpinner(false);
+              }
+            });
+        }
       },
     });
 
@@ -203,7 +208,7 @@ const Signup = () => {
                   <div className="col">
                     <label>Password</label>
                     <input
-                      type="text"
+                      type="password"
                       name="passWord"
                       id="psw"
                       className="form-control form-control-sm"
@@ -218,8 +223,8 @@ const Signup = () => {
                   <div className="col">
                     <label>Confirm Password</label>
                     <input
-                      type="text"
-                      name="confirmpassword"
+                      type="password"
+                      name="confirmPassWord"
                       className="form-control form-control-sm"
                       value={values.confirmPassWord}
                       onChange={handleChange}

@@ -35,8 +35,9 @@ public class Seller {
 
     @JoinColumn(name = "isVerified")
     private boolean isVerified;
-    
-    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL,orphanRemoval = true)
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Product> products;
 
     // Constructors
@@ -121,6 +122,13 @@ public class Seller {
         isVerified = verified;
     }
 
+    public List<Product> getProducts(){
+        return this.products;
+    }
+
+    public void setProducts(List<Product> products){
+        this.products = products;
+    }
 
     public void addProduct(Product product){
         this.products.add(product);

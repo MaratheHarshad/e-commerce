@@ -13,6 +13,7 @@ import SellerLogin from "./pages/seller/SellerLogin";
 import Orders from "./pages/user/Orders";
 import { SellerRegister } from "./pages/seller/SellerRegister";
 import SellerHome from "./pages/seller/SellerHome";
+import OrderSuccessful from "./pages/user/OrderSuccessful";
 /*import { Home } from './pages/Home';
 
 
@@ -22,6 +23,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import { AdminLogin } from "./pages/admin/AdminLogin";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import PaymentForm from "./pages/user/PaymentForm";
 
 function App() {
   const loginUser = useSelector((state) => state.user);
@@ -51,10 +53,11 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
+      <div style={{ "margin-top": "100px" }}></div>
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/home" element={<Home />}></Route>
-        <Route path="/viewBook/:id" element={<ViewBook />}></Route>
+        <Route path="/book/:bookname/:id" element={<ViewBook />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
@@ -63,6 +66,9 @@ function App() {
         <Route path="/sellerRegister" element={<SellerRegister />}></Route>
         <Route path="/sellerHome" element={<SellerHome />}></Route>
         <Route path="/sellerLogin" element={<SellerLogin />}></Route>
+        <Route path="/orderSuccessful" element={<OrderSuccessful />}></Route>
+        <Route path="/PaymentForm/:amount" element={<PaymentForm />}></Route>
+
         <Route
           path="/adminDashboard"
           // element={

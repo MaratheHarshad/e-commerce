@@ -43,6 +43,7 @@ public class SellerController {
 
         try {
             Seller seller = sellerService.createSeller(sellerRegistrationDto);
+            
             return ResponseEntity.ok("Seller Registration Request is under processing");
         }
 
@@ -88,14 +89,21 @@ public class SellerController {
 
     }
 
-    @DeleteMapping("/{sellerId}")
-    public ResponseEntity<Void> deleteSeller(@PathVariable Long sellerId) {
-        boolean deleted = sellerService.deleteSeller(sellerId);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    @DeleteMapping("/seller/{sellerId}")
+    public ResponseEntity<?> deleteSeller(@RequestHeader String Authorization, @PathVariable Long sellerId) {
+
+
+        String adminJwtToken = Authorization;
+        System.out.println(sellerId + ", " + adminJwtToken);
+        try{
+            boolean deleteSeller = sellerService.deleteSeller(sellerId, adminJwtToken);
+            return ResponseEntity.status(HttpStatus.OK).body("Seller Removed Successfully");
+        }catch (UserNotFoundException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found " + ex.getMessage());
+        }catch (AuthenticationFailedException ex){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication Failed " + ex.getMessage());
         }
+
     }
     
     
@@ -104,7 +112,8 @@ public class SellerController {
     	
     	String jwtToken = Authorization;
 
-        // authorize whether request is made by admin or not
+       
+    	
 
         try {
 

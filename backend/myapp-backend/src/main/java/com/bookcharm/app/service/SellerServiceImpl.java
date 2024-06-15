@@ -148,6 +148,10 @@ public class SellerServiceImpl implements SellerService {
                 Seller existingSeller = optionalSeller.get();
                 // mark the existing seller as verified seller
                existingSeller.setVerified(true);
+
+                // notify the seller on email to notify them that they are registered successfully on a system
+                // and congratulate them that they can now login on application as seller
+
                 // Save and return the updated seller
                 return sellerRepository.save(existingSeller);
             }else {
@@ -163,12 +167,41 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public boolean deleteSeller(Long sellerId) {
-        if (sellerRepository.existsById(sellerId)) {
-            sellerRepository.deleteById(sellerId);
-            return true;
+    public boolean deleteSeller(Long sellerId, String jwtToken) {
+
+        Optional<Long> optionalAdminId  = jwtUtil.verifyAdmin(jwtToken);
+
+        if(optionalAdminId.isPresent()){
+
+            // find seller with id to modify it's state
+            Optional<Seller> optionalSeller = sellerRepository.findById(sellerId);
+
+            if (optionalSeller.isPresent()) {
+
+                Seller existingSeller = optionalSeller.get();
+
+//                remove the non verified seller, from the db
+
+                // mark the existing seller as verified seller
+                existingSeller.setVerified(false);
+
+
+
+                sellerRepository.delete(existingSeller);
+
+                // notify the seller on email to notify them that they are rejected because of ___ reason
+
+                return true;
+            }else {
+
+                throw new UserNotFoundException("Seller with this id not found");
+            }
+
+        }else{
+            throw new UnauthorizedAccessException("unauthorized access to resource");
         }
-        return false;
+
+
     }
     
     // Only admin will able to check un verified sellers
@@ -197,6 +230,8 @@ public class SellerServiceImpl implements SellerService {
         // through an error when user password not matched with passed password
         if(clientResponse.statusCode().equals(HttpStatus.UNAUTHORIZED)){
             return Mono.error(new AuthenticationFailedException("password not match"));
+        }else if(clientResponse.statusCode().equals(HttpStatus.CONFLICT)) {
+        	return Mono.error(new EmailAlreadyExistsException("Provided email already exists"));
         }
 
         return Mono.error(new ClientErrorException("Client Error: " + clientResponse.statusCode()));
