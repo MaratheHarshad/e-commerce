@@ -153,6 +153,13 @@ b. Starting the Frontend
 
 Once all services are running, you can access the Book Charm application by navigating to http://localhost:3000 in your web browser.
 
+
+## Future Plans
+
+- Full Payment Integration
+- Enhance the UI/UX
+- AWS to store Images
+
 ## Additional Notes
 
 - Ensure that backend services are running before starting the frontend.
